@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Soccer World App</title>
+    <style>
+        /* CSS: O estilo visual do app */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #e9ecef;
+        }
+
+        .container {
+            position: relative; 
+            width: 90%;
+            max-width: 400px;
+            background-color: #ffffff;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            text-align: center;
+        }
+
+        /* Estilo da versão no canto inferior direito */
+        #version-info {
+            position: absolute;
+            bottom: 5px;
+            right: 10px;
+            font-size: 0.7em;
+            color: #ccc;
+        }
+        
+        /* Mensagem "Em Breve" */
+        #soon-info {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 0.8em;
+            color: #dc3545;
+            font-weight: bold;
+        }
+
+        /* Estilo do título principal */
+        h1 {
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        /* Estilo da decoração "Soccer World" */
+        .soccer-decoration {
+            color: #28a745;
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            border-bottom: 2px solid #28a745;
+            display: inline-block;
+            padding-bottom: 5px;
+        }
+        
+        /* Mensagem de Feliz Natal */
+        .christmas-message {
+            color: #dc3545;
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+
+        /* Estilo base dos botões (AZUL PADRÃO) */
+        button {
+            background-color: #007bff; /* Azul padrão */
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            margin: 8px 0;
+            cursor: pointer;
+            border-radius: 8px;
+            width: 100%;
+            font-size: 16px;
+            font-weight: bold;
+            transition: transform 0.1s, background-color 0.3s;
+        }
+
+        button:hover:not(:disabled) {
+            background-color: #0056b3;
+            transform: scale(1.02);
+        }
+
+        button.secondary {
+            background-color: #6c757d;
+        }
+        button.secondary:hover:not(:disabled) {
+            background-color: #545b62;
+        }
+        
+        button.team-btn { 
+            background-color: #343a40;
+        }
+        button.team-btn:hover:not(:disabled) {
+            background-color: #1d2124;
+        }
+        
+        /* NOVO ESTILO: Botão BOLA DE OURO (Amarelo/Original) */
+        button.ballon-dor-btn {
+            background-color: #ffc107; /* Amarelo */
+            color: #333; /* Texto escuro */
+            font-weight: bolder;
+        }
+        button.ballon-dor-btn:hover {
+            background-color: #e0a800; /* Amarelo mais escuro no hover */
+        }
+        
+        /* MODO VERMELHO (red-mode) */
+        .red-mode button {
+            background-color: #dc3545; 
+        }
+        .red-mode button:hover:not(:disabled) {
+            background-color: #c82333; 
+        }
+        .red-mode button.secondary {
+            background-color: #c0c0c0;
+            color: #333;
+        }
+        .red-mode button.secondary:hover:not(:disabled) {
+            background-color: #a0a0a0;
+        }
+        .red-mode button.team-btn {
+            background-color: #343a40; 
+        }
+        /* MODO VERMELHO: Cor do botão Bola de Ouro */
+        .red-mode button.ballon-dor-btn {
+            background-color: #dc3545; /* Vira Vermelho */
+            color: white; 
+        }
+        .red-mode button.ballon-dor-btn:hover {
+            background-color: #c82333; 
+        }
+
+
+        /* Estilo para desativar botões */
+        button:disabled {
+            background-color: #cccccc;
+            color: #666666;
+            cursor: not-allowed;
+        }
+
+        /* Área onde o texto muda */
+        .content-area {
+            min-height: 120px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        /* Estilo para a curiosidade */
+        .curiosity-box {
+            background-color: #f0fff0;
+            border: 1px solid #28a745;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 8px;
+            font-size: 1.1em;
+            text-align: center;
+        }
+        
+        /* Estilo para a tabela de resultados da Bola de Ouro */
+        .ballon-dor-table {
+            width: 100%;
+            margin-top: 15px;
+            border-collapse: collapse;
+        }
+        .ballon-dor-table th, .ballon-dor-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            font-size: 0.9em;
+        }
+        .ballon-dor-table th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container" id="app-container">
+        <h1 id="screen-title">Bem-vindo</h1>
+        
+        <div id="app-content" class="content-area">
+            </div>
+        
+        <div id="soon-info" style="display: none;"></div> 
+        
+        <div id="version-info">Versão 0.02</div>
+    </div>
+
+    <script>
+        // --- JAVASCRIPT: A LÓGICA DO APP ---
+
+        const appContainer = document.getElementById('app-container');
+        const appContent = document.getElementById('app-content');
+        const screenTitle = document.getElementById('screen-title');
+        const soonInfo = document.getElementById('soon-info');
+        
+        let isRedMode = false;
+        
+        // ⚽ DADOS: CURIOSIDADES GERAIS ⚽
+        const curiosidadesGerais = [
+            "A primeira Copa do Mundo foi realizada na América do Sul, no Uruguai, em 1930.",
+            "Só o Brasil tem a distinção de ter disputado todas as Copas do Mundo de Futebol da história.",
+            "O primeiro gol do Brasil em Copas foi marcado por Preguinho, durante a edição de 1930.",
+            "O gesto de erguer a taça após vencer o Mundial foi uma tradição iniciada pelo Brasil em 1958, quando conquistou seu primeiro título.",
+            "Até o ano de 1970, não eram utilizados cartões (vermelhos ou amarelos) em jogos oficiais.",
+            "A bola de futebol original era feita com a bexiga de boi.",
+            "A maior goleada da história do futebol brasileiro foi a vitória do Botafogo sobre o Madureira por incríveis 24x0, registrada em 1909.",
+            "Um jogo na Argentina em 2011 registrou o recorde de expulsões: 36 cartões vermelhos distribuídos.",
+            "A taça da Copa do Mundo atual pesa mais de seis quilos e é feita com ouro puro, malaquita, prata e cobre.",
+            "O maior público registrado em um jogo de Futebol foi na final da Copa de 1950, no Maracanã, com cerca de 199.854 pessoas."
+        ];
+        
+        // 🏆 DADOS: CAMPEÕES DA BOLA DE OURO (Top 3 de anos recentes)
+        const bolaDeOuroVencedores = [
+            { ano: 2023, pos: 1, nome: "Lionel Messi", clube: "Inter Miami/PSG", pais: "Argentina" },
+            { ano: 2023, pos: 2, nome: "Erling Haaland", clube: "Manchester City", pais: "Noruega" },
+            { ano: 2023, pos: 3, nome: "Kylian Mbappé", clube: "PSG", pais: "França" },
+            
+            { ano: 2022, pos: 1, nome: "Karim Benzema", clube: "Real Madrid", pais: "França" },
+            { ano: 2022, pos: 2, nome: "Sadio Mané", clube: "Bayern/Liverpool", pais: "Senegal" },
+            { ano: 2022, pos: 3, nome: "Kevin De Bruyne", clube: "Manchester City", pais: "Bélgica" },
+
+            { ano: 2021, pos: 1, nome: "Lionel Messi", clube: "PSG/Barcelona", pais: "Argentina" },
+            { ano: 2021, pos: 2, nome: "Robert Lewandowski", clube: "Bayern de Munique", pais: "Polônia" },
+            { ano: 2021, pos: 3, nome: "Jorginho", clube: "Chelsea", pais: "Itália" }
+        ];
+
+        const timesDoBrasil = [
+            "São Paulo", "Flamengo", "Vasco", "Palmeiras", "Santos", "Cruzeiro"
+        ];
+        const curiosidadesTimes = {}; 
+
+        let curiosidadeAtualIndex = 0; 
+        let listaAtualCuriosidades = []; 
+
+        function esconderEmBreve() {
+            soonInfo.style.display = 'none';
+            soonInfo.textContent = '';
+        }
+
+        // 1. TELA INICIAL (Menu Principal)
+        function mostrarMenuPrincipal() {
+            esconderEmBreve();
+            screenTitle.textContent = "Menu Principal";
+            appContent.innerHTML = `
+                <div class="soccer-decoration">🎅⚽ Soccer World ⚽🎅</div>
+                
+                <button onclick="mostrarTelaOpcoes()">Abrir</button>
+                <button onclick="mostrarCreditos()">Créditos</button>
+                
+                <button class="secondary" onclick="mostrarConfiguracoes()">Configurações</button>
+                
+                <div class="christmas-message">Feliz Natal!</div>
+            `;
+        }
+
+        // 2. TELA DE OPÇÕES (Ao clicar em Abrir)
+        function mostrarTelaOpcoes() {
+            esconderEmBreve();
+            screenTitle.textContent = "Explorar";
+            appContent.innerHTML = `
+                <p>O que você deseja acessar?</p>
+                <button onclick="mostrarGuiaPasso1()">Guia</button>
+                <button onclick="iniciarObservacoes()">Observações (Gerais)</button>
+                <button onclick="mostrarTimesBrasil()">Times do Brasil</button>
+                <button class="secondary" onclick="mostrarMenuPrincipal()">Voltar</button>
+            `;
+        }
+        
+        // 3. TELA DE CONFIGURAÇÕES
+        function mostrarConfiguracoes() {
+            esconderEmBreve();
+            screenTitle.textContent = "Configurações";
+            
+            const textoBotao = isRedMode 
+                ? 'Mudar para cores originais' 
+                : 'Mudar cor dos botões para vermelho';
+            
+            appContent.innerHTML = `
+                <p>Personalize a aparência do seu App:</p>
+                <button onclick="alternarCorBotoes()">${textoBotao}</button>
+                <button class="secondary" onclick="mostrarMenuPrincipal()">Voltar</button>
+            `;
+        }
+        
+        // 4. FUNÇÃO PARA ALTERNAR A COR DOS BOTÕES
+        function alternarCorBotoes() {
+            isRedMode = !isRedMode; 
+            
+            if (isRedMode) {
+                appContainer.classList.add('red-mode');
+            } else {
+                appContainer.classList.remove('red-mode');
+            }
+            
+            mostrarConfiguracoes();
+        }
+
+        // 5. TELA TIMES DO BRASIL
+        function mostrarTimesBrasil() {
+            screenTitle.textContent = "Times do Brasil";
+            soonInfo.style.display = 'block'; 
+            soonInfo.textContent = 'Em Breve';
+            
+            let botoesTimes = '';
+            timesDoBrasil.forEach(time => {
+                botoesTimes += `<button class="team-btn" disabled>${time}</button>`;
+            });
+            
+            appContent.innerHTML = `
+                <p>Selecione o time para ver as curiosidades (Recurso em desenvolvimento):</p>
+                ${botoesTimes}
+                <button class="secondary" onclick="mostrarTelaOpcoes()">Voltar para Explorar</button>
+            `;
+        }
+        
+        // 6. FUNÇÃO GENÉRICA PARA EXIBIR CURIOSIDADES GERAIS (Modificada!)
+        function exibirCuriosidade(index) {
+            esconderEmBreve();
+            listaAtualCuriosidades = curiosidadesGerais;
+            screenTitle.textContent = "Observações";
+            
+            if (index < listaAtualCuriosidades.length) {
+                appContent.innerHTML = `
+                    <p style="font-weight: bold;">Curiosidade ${index + 1} de ${listaAtualCuriosidades.length}:</p>
+                    <div class="curiosity-box">
+                        ${listaAtualCuriosidades[index]}
+                    </div>
+                    <button onclick="exibirCuriosidade(${index + 1})">Continuar</button>
+                    <button class="ballon-dor-btn" onclick="mostrarBolaDeOuro()">🏆 Bola de Ouro</button>
+                    <button class="secondary" onclick="mostrarTelaOpcoes()">Voltar para Explorar</button>
+                `;
+            } else {
+                appContent.innerHTML = `
+                    <p style="font-weight: bold; margin: 30px 0;">Fim das Observações!</p>
+                    <button onclick="iniciarObservacoes()">Ver Novamente</button>
+                    <button class="ballon-dor-btn" onclick="mostrarBolaDeOuro()">🏆 Bola de Ouro</button>
+                    <button class="secondary" onclick="mostrarTelaOpcoes()">Voltar para Explorar</button>
+                `;
+            }
+        }
+        
+        // 7. NOVO: TELA DA BOLA DE OURO
+        function mostrarBolaDeOuro() {
+            esconderEmBreve();
+            screenTitle.textContent = "🏆 Bola de Ouro";
+            
+            let tabelaHTML = `<table class="ballon-dor-table">
+                <tr><th>Ano</th><th>Pos.</th><th>Nome do Vencedor</th><th>Clube/País</th></tr>`;
+            
+            // Preenche a tabela com os dados
+            bolaDeOuroVencedores.forEach(vencedor => {
+                const linhaClass = vencedor.pos === 1 ? 'style="font-weight: bold; background-color: #fffacd;"' : ''; // Destaque para o primeiro lugar
+                tabelaHTML += `
+                    <tr ${linhaClass}>
+                        <td>${vencedor.ano}</td>
+                        <td>${vencedor.pos}º</td>
+                        <td>${vencedor.nome}</td>
+                        <td>${vencedor.clube} (${vencedor.pais})</td>
+                    </tr>
+                `;
+            });
+            
+            tabelaHTML += `</table>`;
+
+            appContent.innerHTML = `
+                <p style="margin-bottom: 5px;">Vencedores Recentes e Posições (Top 3):</p>
+                ${tabelaHTML}
+                <p style="font-size: 0.8em; margin-top: 15px;">A Bola de Ouro é o prêmio individual de futebol mais prestigiado do mundo.</p>
+                <button class="secondary" onclick="mostrarTelaOpcoes()">Voltar para Explorar</button>
+            `;
+        }
+        
+        // 8. INICIA CURIOSIDADES GERAIS
+        function iniciarObservacoes() {
+            esconderEmBreve();
+            curiosidadeAtualIndex = 0; 
+            exibirCuriosidade(curiosidadeAtualIndex);
+        }
+        
+        // --- GUIA, CRÉDITOS --- (Mantidas)
+        function mostrarGuiaPasso1() {
+            esconderEmBreve();
+            screenTitle.textContent = "Guia Virtual";
+            appContent.innerHTML = `
+                <div class="robot-text">
+                    "Olá, usuário! Sou o <strong>The Robot</strong> e sou o mais novo guia em desenvolvimento. Clique em continuar para prosseguir."
+                </div>
+                <button onclick="mostrarGuiaPasso2()">Continuar</button>
+                <button class="secondary" onclick="mostrarTelaOpcoes()">Cancelar</button>
+            `;
+        }
+
+        function mostrarGuiaPasso2() {
+            esconderEmBreve();
+            screenTitle.textContent = "Guia Virtual";
+            appContent.innerHTML = `
+                <div class="robot-text">
+                    "Aqui é o universo do futebol! Em 'Observações', irá encontrar muitas coisas divertidas sobre futebol! Até mais, usuário."
+                </div>
+                <button onclick="mostrarMenuPrincipal()">Voltar ao Início</button>
+            `;
+        }
+
+        function mostrarCreditos() {
+            esconderEmBreve();
+            screenTitle.textContent = "Créditos";
+            appContent.innerHTML = `
+                <div style="margin: 30px 0;">
+                    <p style="font-size: 1.2em; color: #555;">Desenvolvido por:</p>
+                    <h2 style="color: #007bff;">XXlolXX</h2>
+                </div>
+                <button class="secondary" onclick="mostrarMenuPrincipal()">Voltar</button>
+            `;
+        }
+
+        // Iniciar o aplicativo carregando o menu
+        mostrarMenuPrincipal();
+        
+        if (isRedMode) {
+             appContainer.classList.add('red-mode');
+        }
+
+    </script>
+
+</body>
+</html>
